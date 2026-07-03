@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model CONTRATA {
+  idPack         String        @db.Uuid
+  idNutri        String        @db.Uuid
+  fechaInicio    DateTime      @db.Timestamptz(6)
+  fechaFin       DateTime      @db.Timestamptz(6)
+  idContratacion String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  NUTRICIONISTA  NUTRICIONISTA @relation(fields: [idNutri], references: [idNutri], onDelete: NoAction, onUpdate: NoAction)
+  PACK           PACK          @relation(fields: [idPack], references: [idPack], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model DIETA {
+  idDieta     String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  idPaciente  String   @db.Uuid
+  fechaInicio DateTime @db.Timestamptz(6)
+  fechaFin    DateTime @db.Timestamptz(6)
+  descripcion Json
+  PACIENTE    PACIENTE @relation(fields: [idPaciente], references: [idPaciente], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model NUTRICIONISTA {
+  idNutri  String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  nombre   String
+  email    String     @unique
+  logoUrl  String?
+  CONTRATA CONTRATA[]
+  PACIENTE PACIENTE[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model PACIENTE {
+  idPaciente    String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  idNutri       String         @db.Uuid
+  nombre        String
+  edad          Int?
+  pesoInicial   Decimal        @db.Decimal(5, 2)
+  DIETA         DIETA[]
+  NUTRICIONISTA NUTRICIONISTA  @relation(fields: [idNutri], references: [idNutri], onDelete: Cascade, onUpdate: NoAction)
+  PROGRESS_LOG  PROGRESS_LOG[]
+}
+
+model PACK {
+  idPack   String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tipoPack PACKS
+  precio   Decimal    @db.Decimal(10, 2)
+  CONTRATA CONTRATA[]
+}
+
+model PROGRESS_LOG {
+  idLog         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  idPaciente    String   @db.Uuid
+  fecha         DateTime @db.Timestamptz(6)
+  peso          Decimal  @db.Decimal(5, 2)
+  observaciones Json
+  PACIENTE      PACIENTE @relation(fields: [idPaciente], references: [idPaciente], onDelete: Cascade, onUpdate: NoAction)
+}
+
+enum PACKS {
+  B_sico      @map("Básico")
+  Est_ndar    @map("Estándar")
+  Profesional
+  Premium
+}
