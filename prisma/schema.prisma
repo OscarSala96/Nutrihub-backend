@@ -6,6 +6,7 @@ datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
+  schemas   = ["public"]
 }
 
 model CONTRATA {
@@ -16,6 +17,8 @@ model CONTRATA {
   idContratacion String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   NUTRICIONISTA  NUTRICIONISTA @relation(fields: [idNutri], references: [idNutri], onDelete: NoAction, onUpdate: NoAction)
   PACK           PACK          @relation(fields: [idPack], references: [idPack], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
 }
 
 model DIETA {
@@ -25,15 +28,22 @@ model DIETA {
   fechaFin    DateTime @db.Timestamptz(6)
   descripcion Json
   PACIENTE    PACIENTE @relation(fields: [idPaciente], references: [idPaciente], onDelete: Cascade, onUpdate: NoAction)
+
+  @@schema("public")
 }
 
 model NUTRICIONISTA {
-  idNutri  String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  nombre   String
-  email    String     @unique
-  logoUrl  String?
-  CONTRATA CONTRATA[]
-  PACIENTE PACIENTE[]
+  idNutri    String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  nombre     String
+  email      String     @unique
+  logoUrl    String?
+  authUserId String?    @unique @map("auth_user_id") @db.Uuid
+  createdAt  DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  CONTRATA   CONTRATA[]
+  PACIENTE   PACIENTE[]
+
+  @@schema("public")
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -43,9 +53,16 @@ model PACIENTE {
   nombre        String
   edad          Int?
   pesoInicial   Decimal        @db.Decimal(5, 2)
+  authUserId    String?        @unique @map("auth_user_id") @db.Uuid
+  email         String?
+  telefono      String?
+  createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime       @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   DIETA         DIETA[]
   NUTRICIONISTA NUTRICIONISTA  @relation(fields: [idNutri], references: [idNutri], onDelete: Cascade, onUpdate: NoAction)
   PROGRESS_LOG  PROGRESS_LOG[]
+
+  @@schema("public")
 }
 
 model PACK {
@@ -53,6 +70,8 @@ model PACK {
   tipoPack PACKS
   precio   Decimal    @db.Decimal(10, 2)
   CONTRATA CONTRATA[]
+
+  @@schema("public")
 }
 
 model PROGRESS_LOG {
@@ -62,6 +81,8 @@ model PROGRESS_LOG {
   peso          Decimal  @db.Decimal(5, 2)
   observaciones Json
   PACIENTE      PACIENTE @relation(fields: [idPaciente], references: [idPaciente], onDelete: Cascade, onUpdate: NoAction)
+
+  @@schema("public")
 }
 
 enum PACKS {
@@ -69,4 +90,6 @@ enum PACKS {
   Est_ndar    @map("Estándar")
   Profesional
   Premium
+
+  @@schema("public")
 }
