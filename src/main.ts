@@ -11,7 +11,7 @@ async function bootstrap() {
     .filter(Boolean);
   app.enableCors({
     origin:[
-      'http://nutrihub-frontend.vercel.app',
+      'https://nutrihub-frontend.vercel.app',
       'http://localhost:3001'
     ],
     credentials: true,
