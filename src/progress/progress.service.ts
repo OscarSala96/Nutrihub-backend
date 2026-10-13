@@ -27,7 +27,7 @@ export class ProgressService {
         idPaciente,
         fecha: dto.fecha ? new Date(dto.fecha) : new Date(),
         peso: dto.peso,
-        observaciones: (dto.observaciones ?? {}) as Prisma.InputJsonValue,
+        observaciones: (dto.observaciones ?? {}) as Prisma.InputJsonObject,
       },
     });
   }
@@ -46,7 +46,7 @@ export class ProgressService {
         idPaciente: patient.idPaciente,
         fecha: dto.fecha ? new Date(dto.fecha) : new Date(),
         peso: dto.peso,
-        observaciones: (dto.observaciones ?? {}) as Prisma.InputJsonValue,
+        observaciones: (dto.observaciones ?? {}) as Prisma.InputJsonObject,
       },
     });
   }

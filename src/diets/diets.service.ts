@@ -27,7 +27,7 @@ export class DietsService {
         idPaciente,
         fechaInicio: new Date(dto.fechaInicio),
         fechaFin: new Date(dto.fechaFin),
-        descripcion: dto.descripcion as Prisma.InputJsonValue,
+        descripcion: dto.descripcion as Prisma.InputJsonObject,
       },
     });
   }
