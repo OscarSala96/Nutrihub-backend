@@ -10,8 +10,10 @@ async function bootstrap() {
     .map((origin) => origin.trim())
     .filter(Boolean);
   app.enableCors({
-    origin:
+    origin:[
+      'https://nutrihub-frontend.vercel.app/',
       corsOrigins.length === 1 && corsOrigins[0] === '*' ? true : corsOrigins,
+    ],
     credentials: true,
   });
   app.useGlobalPipes(
